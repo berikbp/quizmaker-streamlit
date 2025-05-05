@@ -266,7 +266,7 @@ def list_tests_page():
                 all_tags.add(t)
     all_tags = sorted(all_tags)
 
-    #Filter 
+    #Filter
     selected_tags = st.multiselect("Фильтровать по тегам", all_tags)
     if selected_tags:
         df = df[df['tags'].fillna("").apply(
@@ -357,10 +357,15 @@ def take_full_test_page():
                 else [q["correct"]]
             )
             if isinstance(user_ans, list):
-                if set(user_ans) == set(correct_list):
+                norm_user = {a.strip().lower() for a in user_ans}
+                norm_corr = {c.strip().lower() for c in correct_list}
+                if norm_user == norm_corr:
                     total_score += q["points"]
             else:
-                if user_ans == correct_list[0]:
+                # для текстовых ответов
+                ans_norm  = user_ans.strip().lower()
+                corr_norm = correct_list[0].strip().lower()
+                if ans_norm == corr_norm:
                     total_score += q["points"]
 
         st.session_state.fulltest_submitted = True
