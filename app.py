@@ -246,38 +246,8 @@ def create_test_wizard_page():
             del st.session_state.wizard
 
 
-# Helper: Show one question during a full test
-def show_question(q_id):
-    state = st.session_state
-    conn = sqlite3.connect(DB_PATH)
-    text, qtype, raw, correct, points = conn.execute(
-        "SELECT text,type,choices,correct,points FROM questions WHERE id=?", (q_id,)
-    ).fetchone()
-    conn.close()
-
-    st.subheader(text)
     
-    
-    with st.form(f"question_form_{q_id}"):
-        if qtype == "Один ответ":
-            ans = st.radio("Варианты ответа", raw.split("|"))
-        elif qtype == "Множественный выбор":
-            ans = st.multiselect("Варианты ответа", raw.split("|"))
-        else:
-            ans = st.text_input("Ваш ответ")
-        
-        
-        if st.form_submit_button("Дальше"):
-            if isinstance(ans, list):
-                is_ok = set(ans) == set(correct.split("|"))
-            else:
-                is_ok = (ans == correct)
-            
-            if is_ok:
-                state.test_score += points
-            state.current_q_index += 1
-    
-# Page: List all tests
+#List all tests
 def list_tests_page():
     st.header("📚 Список тестов")
     conn = sqlite3.connect(DB_PATH)
@@ -296,6 +266,7 @@ def list_tests_page():
                 all_tags.add(t)
     all_tags = sorted(all_tags)
 
+    #Filter 
     selected_tags = st.multiselect("Фильтровать по тегам", all_tags)
     if selected_tags:
         df = df[df['tags'].fillna("").apply(
@@ -307,7 +278,7 @@ def list_tests_page():
     if name_query:
         df = df[df['name'].str.contains(name_query, case=False, na=False)]
 
-
+    # Pagination
     PAGE_SIZE = 5
     total_pages = (len(df) - 1) // PAGE_SIZE + 1
     page = st.number_input("Страница", 1, total_pages, 1, 1)
@@ -321,7 +292,7 @@ def list_tests_page():
 def take_full_test_page():
     st.header("📝 Пройти тест (все вопросы на одной странице)")
 
-
+    # Load all available tests
     conn = sqlite3.connect(DB_PATH)
     tests_df = pd.read_sql("SELECT id, name FROM tests", conn)
     conn.close()
@@ -373,6 +344,7 @@ def take_full_test_page():
         submitted = st.form_submit_button("Отправить все ответы")
 
 
+    # On submit, calculate total and max score
     if submitted:
         total_score = 0
         max_score = 0
