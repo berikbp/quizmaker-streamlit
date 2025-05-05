@@ -27,7 +27,13 @@ QuizMaker — это сайт созданный на Streamlit, которое 
 ```
  2. Создайте и активируйте виртуальное окружение
 
-    Linux/macOS:
+Сперва пишите 
+```bash
+python -m venv .venv
+
+```
+Дальше 
+   Linux/macOS:
 source .venv/bin/activate
 ```bash
    source .venv/bin/activate
