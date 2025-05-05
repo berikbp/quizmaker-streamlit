@@ -4,6 +4,9 @@ import pandas as pd
 import os
 
 DB_PATH = "data/questions.db"
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(PROJECT_ROOT, "data", "questions.db")
+
 
 # Initialize database and tables
 def init_db():
